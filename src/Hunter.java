@@ -18,6 +18,7 @@ public class Hunter
      * The base constructor of a Hunter assigns the name to the hunter and an empty kit.
      *
      * @param hunterName The hunter's name.
+     * @param startingGold the starting gold the player receives
      */
     public Hunter(String hunterName, int startingGold)
     {
@@ -33,10 +34,6 @@ public class Hunter
         return hunterName;
     }
 
-    public boolean noGold() {
-        return noGold;
-    }
-
     public String getKit()
     {
         return kit;
@@ -50,10 +47,14 @@ public class Hunter
     public void changeGold(int modifier)
     {
         gold += modifier;
-        if (gold < 0)
+        if (gold <= 0)
         {
             gold = 0;
+            noGold=true;
         }
+    }
+    public boolean noGold() {
+        return noGold;
     }
 
     /**
@@ -123,7 +124,7 @@ public class Hunter
      * A KIT_DELIMITER character is added to the end of the of String.
      *
      * @param item The item to be added to the kit.
-     * @returns true if the item is not in the kit and has been added.
+     * @return true if the item is not in the kit and has been added.
      */
     public boolean addItem(String item)
     {

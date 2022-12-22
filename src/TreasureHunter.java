@@ -1,4 +1,3 @@
-
 /**
  * This class is responsible for controlling the Treasure Hunter game.<p>
  * It handles the display of the menu and the processing of the player's choices.<p>
@@ -7,19 +6,21 @@
  */
 import java.util.Scanner;
 
-public class TreasureHunter {
-    // Instance variables
+public class TreasureHunter
+{
+    //Instance variables
     private Town currentTown;
     private Hunter hunter;
     private boolean hardMode;
     public static boolean easyMode;
     private static boolean cheatMode;
 
-    // Constructor
+    //Constructor
     /**
      * Constructs the Treasure Hunter game.
      */
-    public TreasureHunter() {
+    public TreasureHunter()
+    {
         // these will be initialized in the play method
         currentTown = null;
         hunter = null;
@@ -27,16 +28,19 @@ public class TreasureHunter {
         cheatMode = false;
     }
 
-    // starts the game; this is the only public method
-    public void play() {
+    /**
+     * method that starts the game; this is the only public method
+     */
+
+    public void play ()
+    {
         welcomePlayer();
         enterTown();
         showMenu();
     }
 
     /**
-     * Creates a hunter object at the beginning of the game and populates the class
-     * member variable with it.
+     * Creates a hunter object at the beginning of the game and populates the class member variable with it.
      */
     private void welcomePlayer()
     {
@@ -73,11 +77,16 @@ public class TreasureHunter {
         }
     }
 
+    //accessor
+    public static boolean getEasyMode(){
+        return easyMode;
+    }
 
     /**
      * Creates a new town and adds the Hunter to it.
      */
-    private void enterTown() {
+    private void enterTown()
+    {
         double markdown = 0.25;
         double toughness = 0.4;
         if (hardMode)
@@ -111,17 +120,18 @@ public class TreasureHunter {
     }
 
     /**
-     * Displays the menu and receives the choice from the user.
-     * <p>
-     * The choice is sent to the processChoice() method for parsing.
-     * <p>
+     * Displays the menu and receives the choice from the user.<p>
+     * The choice is sent to the processChoice() method for parsing.<p>
      * This method will loop until the user chooses to exit.
+     * This method will also force you to lose if you lose all your gold
      */
-    private void showMenu() {
-        Scanner scanner = new Scanner(System.in);
+    private void showMenu()
+    {
         String choice = "";
+        Scanner scanner = new Scanner(System.in);
+        while (!(choice.equals("X") || choice.equals("x")) && !Treasure.isAllTreasureFound())
+        {
 
-        while (!(choice.equals("X") || choice.equals("x"))) {
             System.out.println();
             System.out.println(currentTown.getLatestNews());
             System.out.println("***");
@@ -131,32 +141,30 @@ public class TreasureHunter {
             System.out.println("(S)ell something at the shop.");
             System.out.println("(M)ove on to a different town.");
             System.out.println("(L)ook for trouble!");
-            System.out.println("Search for (T)reasure!");
             System.out.println("Give up the hunt and e(X)it.");
             System.out.println();
             System.out.print("What's your next move? ");
             choice = scanner.nextLine();
             choice = choice.toUpperCase();
-
-            if ((hunter.noGold()) && choice.equals("L")){
-                processChoice("X");
-                choice = "X";
-                TreasureHunter.clearScreen();
-            }
-
             processChoice(choice);
+            if ((hunter.noGold() && choice.equals("L")) ) {
+                TreasureHunter.clearScreen();
+                System.out.println("You lost all your gold and lost the game!");
+                System.out.println("Fare thee well, " + hunter.getHunterName() + "!");
+                System.exit(0);
+            }
             if (!choice.equals("L")) {
                 System.out.print("Hit Enter to continue! ");
                 scanner.nextLine();
             }
             TreasureHunter.clearScreen();
         }
+        endGame(choice);
+        scanner.nextLine();
     }
 
     /**
-     * Takes the choice received from the menu and calls the appropriate method to
-     * carry out the instructions.
-     *
+     * Takes the choice received from the menu and calls the appropriate method to carry out the instructions.
      * @param choice The action to process.
      */
     private void processChoice(String choice) {
@@ -170,21 +178,48 @@ public class TreasureHunter {
             }
         } else if (choice.equals("L") || choice.equals("l")) {
             currentTown.lookForTrouble();
+
         } else if (choice.equals("T") || choice.equals("t")) {
             currentTown.searchTreasure();
+            System.out.println(currentTown.getLatestNews());
+
         } else if (choice.equals("X") || choice.equals("x")) {
             System.out.println("Fare thee well, " + hunter.getHunterName() + "!");
+
         } else {
             System.out.println("Yikes! That's an invalid option! Try again.");
         }
     }
 
+    /**
+     * method that clears the screen
+     */
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
 
+    //accessor
     public static boolean isCheatMode() {
         return cheatMode;
+    }
+
+    /**
+     * method that ends the game and prints out a message according to how the game is lost/won/exited
+     * also prints a farewell message with the hunter's name
+     * @param choice represents the choice that the user picked (if it is X, there is no
+     *               need to check for the win/loss condition since they exited the game themselves)
+     */
+    public void endGame(String choice) {
+        if (Treasure.isAllTreasureFound()) {
+            System.out.println("Congratulations, you have found all of the treasures and won the game!!");
+        }
+        if (hunter.noGold()==true){
+            System.out.println("You've run out of gold. You Lose!");
+        }
+
+
+        System.out.println("Fare thee well, " + hunter.getHunterName() + "!");
+
     }
 }

@@ -18,6 +18,11 @@ public class Shop
     private Hunter customer;
 
     //Constructor
+
+    /**
+     * Constructor that sets the price of all the items available in the shop depending on the game mode
+     * @param markdown how much the prices will be marked down when selling them
+     */
     public Shop(double markdown)
     {
         this.markdown = markdown;

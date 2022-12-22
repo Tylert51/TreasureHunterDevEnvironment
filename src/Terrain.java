@@ -34,7 +34,7 @@ public class Terrain
      * Searches the hunter's inventory for the proper item and determines whether or not the hunter can cross.
      *
      * @param hunter The Hunter object trying to cross the terrain.
-     * @returns  true if the Hunter has the proper item.
+     * @return  true if the Hunter has the proper item.
      */
     public boolean canCrossTerrain(Hunter hunter)
     {
@@ -46,6 +46,11 @@ public class Terrain
     }
 
     //toString
+
+    /**
+     * toString method that tells them the item needed to cross a certain town
+     * @return a string that tells the user what item they need to cross the current town they are in
+     */
     public String toString()
     {
         return terrainName + " needs a(n) " + neededItem + " to cross.";

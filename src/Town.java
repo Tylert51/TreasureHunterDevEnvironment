@@ -22,8 +22,10 @@ public class Town
     public Town(Shop shop, double toughness)
     {
         treasure = new Treasure();
+
         this.shop = shop;
         this.terrain = getNewTerrain();
+
 
         // the hunter gets set using the hunterArrives method, which
         // gets called from a client class
@@ -34,11 +36,10 @@ public class Town
         // higher toughness = more likely to be a tough town
         toughTown = (Math.random() < toughness);
 
-
-
         isSearched = false;
     }
 
+    //accessor
     public String getLatestNews()
     {
         return printMessage;
@@ -87,6 +88,10 @@ public class Town
         return false;
     }
 
+    /**
+     * allows the user to enter the shop (called method from the shop class)
+     * @param choice represents the choice that the user picks when entering the shop (either buying (B) or selling (S))
+     */
     public void enterShop(String choice)
     {
         shop.enter(hunter, choice);
@@ -96,6 +101,7 @@ public class Town
      * Gives the hunter a chance to fight for some gold.<p>
      * The chances of finding a fight and winning the gold are based on the toughness of the town.<p>
      * The tougher the town, the easier it is to find a fight, and the harder it is to win one.
+     * 100% win rate when in cheat mode and win 100 gold each time you find a brawl
      */
     public void lookForTrouble()
     {
@@ -109,28 +115,34 @@ public class Town
             noTroubleChance = 0.33;
         }
 
-        if (Math.random() > noTroubleChance)
+        if (Math.random() == noTroubleChance)
         {
             printMessage = "You couldn't find any trouble";
         }
         else
         {
             printMessage = "You want trouble, stranger!  You got it!\nOof! Umph! Ow!\n";
+
             int goldDiff;
 
             if (TreasureHunter.isCheatMode()) {
                 goldDiff = 100;
-            } else {
+            }
+            else {
                 goldDiff = (int) (Math.random() * 10) + 1;
             }
-            if (TreasureHunter.isCheatMode() || Math.random() > noTroubleChance)
-            {
+            if (TreasureHunter.isCheatMode()||Math.random() > noTroubleChance){
+                if (TreasureHunter.getEasyMode()){
+                    goldDiff *=2;
+                }
                 printMessage += "Okay, stranger! You proved yer mettle. Here, take my gold.";
                 printMessage += "\nYou won the brawl and receive " +  goldDiff + " gold.";
                 hunter.changeGold(goldDiff);
             }
-            else
-            {
+            else  {
+                if(TreasureHunter.getEasyMode()){
+                    goldDiff/=3;
+                }
                 printMessage += "That'll teach you to go lookin' fer trouble in MY town! Now pay up!";
                 printMessage += "\nYou lost the brawl and pay " +  goldDiff + " gold.";
                 hunter.changeGold(-1 * goldDiff);
@@ -138,6 +150,10 @@ public class Town
         }
     }
 
+    /**
+     * to string method that just displays where the user is currently
+     * @return a string that displays to the user the current terrain the user is surrounded by (ex Ocean)
+     */
     public String toString()
     {
         return "This nice little town is surrounded by " + terrain.getTerrainName() + ".";
@@ -183,21 +199,26 @@ public class Town
         return (rand < 0.5);
     }
 
+
+    /**
+     * method that allows the user to search for treasure
+     * random chance of finding 1 of 3 treasures (25% for each, 1 our of 4 times you will find nothing)
+     * adds or discards treasure to inventory depending on if you found it already
+     */
     public void searchTreasure() {
-        int randInt = (int) (Math.random() * 4 + 1);
+        int randInt = (int) (Math.random() * 4);
         if(!isSearched) {
 
-            String treasureFound = treasure.getTreasureItems(randInt - 2);
-
-            if(randInt == 1) {
+            if(randInt == 3) {
                 printMessage = "Unlucky, the only that you have found is a couple of worms";
 
-            } else if (randInt == 2) {
+            } else {
+                String treasureFound = Treasure.getTreasureItems(randInt);
 
                 printMessage = "Congratulations, you have found " + treasureFound + "!";
 
-                if (!treasure.isAlreadyFound(0)) {
-                    treasure.newTreasure(0);
+                if (Treasure.isNewTreasure(randInt)) {
+                    Treasure.newTreasure(randInt);
                     printMessage += "\nThe item has been added to your inventory!";
                     hunter.addItem(treasureFound);
 
@@ -205,46 +226,13 @@ public class Town
                     printMessage += "\nYou already found this treasure and it has been discarded from your inventory";
 
                 }
-
-
-            } else if (randInt == 3) {
-
-                printMessage = "Congratulations, you have found " + treasureFound + "!";
-
-                if (!treasure.isAlreadyFound(1)) {
-                    treasure.newTreasure(1);
-                    printMessage += "\nThe item has been added to your inventory!";
-                    hunter.addItem(treasureFound);
-
-                } else {
-                    printMessage += "\nYou already found this treasure and it has been discarded from your inventory";
-
-                }
-
-            }  else if (randInt == 4) {
-
-                printMessage = "Congratulations, you have found " + treasureFound + "!";
-
-                if (!treasure.isAlreadyFound(2)) {
-                    treasure.newTreasure(2);
-                    printMessage += "\nThe item has been added to your inventory!";
-                    hunter.addItem(treasureFound);
-
-                } else {
-                    printMessage += "\nYou already found this treasure and it has been discarded from your inventory";
-
-                }
-
             }
 
             isSearched = true;
-
-
 
         } else {
             printMessage = "You have already serached for treasure in this town\nMove onto another town to search for more";
         }
 
     }
-
 }
