@@ -115,7 +115,7 @@ public class Town
             noTroubleChance = 0.33;
         }
 
-        if (Math.random() == noTroubleChance)
+        if (Math.random() <= noTroubleChance)
         {
             printMessage = "You couldn't find any trouble";
         }
